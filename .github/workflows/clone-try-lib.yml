@@ -1,0 +1,27 @@
+name: Clone try-lib on Push
+
+on:
+  push:
+    branches:
+      - main  # Adjust if your default branch is different
+
+jobs:
+  clone-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Clone try-lib repository
+        uses: actions/checkout@v4
+        with:
+          repository: mattcalkins/try-lib
+          token: ${{ steps.app-token.outputs.token }}
+          path: try-lib  # Optional: specify a path to clone into
+
+      - name: Verify clone by counting files
+        run: 'echo "Number of files in try-lib root: $(ls -1 try-lib | wc -l)"'
